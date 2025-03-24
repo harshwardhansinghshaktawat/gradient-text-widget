@@ -8,8 +8,7 @@ class GradientText extends HTMLElement {
   static get observedAttributes() {
     return [
       'text', 'heading-tag', 'background-color', 'background-opacity',
-      'font-size', 'font-family', 'font-weight', 'line-height',
-      'letter-spacing', 'animation-duration', 'text-alignment', 'gradient-preset'
+      'font-size', 'font-family', 'animation-duration', 'text-alignment', 'gradient-preset'
     ];
   }
 
@@ -48,7 +47,7 @@ class GradientText extends HTMLElement {
 
   startAnimation() {
     const heading = this.shadowRoot.querySelector('.gradient-heading');
-    heading.classList.add('animate');
+    heading.style.animationPlayState = 'running';
   }
 
   getGradientPreset(presetName) {
@@ -96,18 +95,13 @@ class GradientText extends HTMLElement {
     const bgOpacityValue = backgroundOpacity / 100;
     const fontSize = parseFloat(this.getAttribute('font-size')) || 5;
     const fontFamily = this.getAttribute('font-family') || 'Montserrat';
-    const fontWeight = parseInt(this.getAttribute('font-weight')) || 700;
-    const lineHeight = parseInt(this.getAttribute('line-height')) || 120;
-    const letterSpacing = parseInt(this.getAttribute('letter-spacing')) || 5;
     const animationDuration = parseFloat(this.getAttribute('animation-duration')) || 8;
     const textAlignment = this.getAttribute('text-alignment') || 'center';
     const gradientPreset = this.getAttribute('gradient-preset') || 'vivid-flow';
 
     this.isAnimating = false;
 
-    const fontImport = `
-      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&family=Open+Sans:wght@300..800&family=Lobster&family=Poppins:wght@100..900&family=Raleway:wght@100..900&display=swap');
-    `;
+    const fontImport = `@import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontFamily)}:wght@100..900&display=swap');`;
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -119,41 +113,21 @@ class GradientText extends HTMLElement {
           display: flex;
           justify-content: center;
           align-items: center;
-          background-color: rgba(${parseInt(backgroundColor.slice(1, 3), 16), parseInt(backgroundColor.slice(3, 5), 16), parseInt(backgroundColor.slice(5, 7), 16), ${bgOpacityValue}});
+          background-color: rgba(${parseInt(backgroundColor.slice(1, 3), 16), parseInt(backgroundColor.slice(3, 5), 16), parseInt(backgroundColor.slice(5, 7), 16), ${bgOpacityValue});
           overflow: hidden;
         }
 
         .gradient-heading {
-          position: relative;
           font-size: ${fontSize}vw;
-          font-weight: ${fontWeight};
-          line-height: ${lineHeight}px;
-          letter-spacing: ${letterSpacing}px;
           text-align: ${textAlignment};
-          color: #ffffff; /* Fallback color */
-          font-family: '${fontFamily}', sans-serif;
-          margin: 0;
-          display: inline-block;
-        }
-
-        .gradient-heading::before {
-          content: '${text}';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
           background: linear-gradient(45deg, ${this.getGradientPreset(gradientPreset)});
-          background-size: 300% 300%;
           -webkit-background-clip: text;
-          background-clip: text;
           -webkit-text-fill-color: transparent;
-          color: transparent;
-          animation: none; /* Initially no animation */
-        }
-
-        .gradient-heading.animate::before {
+          background-size: 300% 300%;
           animation: gradient-text ${animationDuration}s ease infinite;
+          animation-play-state: paused;
+          margin: 0;
+          font-family: "${fontFamily}", sans-serif;
         }
 
         @keyframes gradient-text {
