@@ -9,7 +9,7 @@ class GradientText extends HTMLElement {
     return [
       'text', 'heading-tag', 'background-color', 'background-opacity',
       'font-size', 'font-family', 'font-weight', 'line-height',
-      'letter-spacing', 'animation-duration', 'text-alignment'
+      'letter-spacing', 'animation-duration', 'text-alignment', 'gradient-preset'
     ];
   }
 
@@ -51,20 +51,58 @@ class GradientText extends HTMLElement {
     heading.style.animationPlayState = 'running';
   }
 
+  getGradientPreset(presetName) {
+    const presets = {
+      'vivid-flow': '#1A759F, #EE6C4D, #3D405B, #A663CC', // Default
+      'sunset-glow': '#FF6B6B, #FFD93D, #FF9F1C, #D00000',
+      'ocean-wave': '#00C4CC, #34E4EA, #0077B6, #023E8A',
+      'forest-dusk': '#2A9D8F, #E9C46A, #F4A261, #264653',
+      'neon-pulse': '#FF006E, #8338EC, #3A86FF, #FFBE0B',
+      'twilight-bliss': '#7209B7, #B5179E, #F72585, #560BAD',
+      'desert-mirage': '#F48C06, #FAA307, #FFBA08, #9D0208',
+      'aurora-borealis': '#006D77, #83C5BE, #EDF6F9, #FFDDD2',
+      'candy-crush': '#FF70A6, #FF9770, #FFD670, #E9FF70',
+      'retro-vibe': '#EF476F, #FFD166, #06D6A0, #118AB2',
+      'cosmic-dream': '#590D22, #800F25, #A4133C, #FF4D6D',
+      'mystic-haze': '#4A5759, #B5838D, #FFB4A2, #E5989B',
+      'golden-hour': '#FFD60A, #FFC107, #FF9505, #FF6200',
+      'lavender-mist': '#7209B7, #A06CD5, #CDB4DB, #FFAFCC',
+      'emerald-tide': '#006466, #065A60, #0B525B, #1B3A4B',
+      'ruby-flare': '#9B1D20, #D00000, #DC2F02, #F48C06',
+      'sapphire-sky': '#03045E, #023E8A, #0077B6, #00B4D8',
+      'tropical-breeze': '#0081A7, #00AFB9, #FED9B7, #FDFCDC',
+      'berry-blast': '#720026, #A30038, #CE4257, #FF7092',
+      'midnight-glow': '#03071E, #370617, #6A040F, #9D0208',
+      'pastel-dream': '#FFCAD4, #F4ACB7, #D8A7B1, #B5838D',
+      'electric-storm': '#FF006E, #3A0CA3, #4361EE, #4CC9F0',
+      'sunrise-blush': '#FF9F1C, #FF70A6, #FF9770, #FFD670',
+      'galactic-shift': '#10002B, #240046, #3C096C, #5A189A',
+      'lime-fusion': '#99E2B4, #88D4AB, #56AB91, #358F80',
+      'coral-reef': '#FF595E, #FFCA3A, #8AC926, #1982C4',
+      'autumn-fade': '#606C38, #283618, #FEFAE0, #DDA15E',
+      'polar-light': '#CAF0F8, #90E0EF, #48CAE4, #00B4D8',
+      'vintage-wine': '#4A2C2A, #6B3E3D, #8D5524, #C98C5C',
+      'cyber-punk': '#FF0A54, #FF477E, #FF5C8A, #FF7092',
+      'spring-bloom': '#E2EA82, #B7E1A1, #8CD790, #62C370'
+    };
+    return presets[presetName] || presets['vivid-flow']; // Fallback to default
+  }
+
   render() {
     const text = this.getAttribute('text') || 'Vivid Flow Unleashed';
     const headingTag = this.getAttribute('heading-tag') || 'h2';
-    const backgroundColor = this.getAttribute('background-color') || '#0A3D62'; // Dark teal
-    const backgroundOpacity = parseFloat(this.getAttribute('background-opacity')) || 100; // 0-100
+    const backgroundColor = this.getAttribute('background-color') || '#0A3D62';
+    const backgroundOpacity = parseFloat(this.getAttribute('background-opacity')) || 100;
     const bgOpacityValue = backgroundOpacity / 100;
     const bgColorWithOpacity = `${backgroundColor}${Math.round(bgOpacityValue * 255).toString(16).padStart(2, '0')}`;
-    const fontSize = parseFloat(this.getAttribute('font-size')) || 5; // In vw
+    const fontSize = parseFloat(this.getAttribute('font-size')) || 5;
     const fontFamily = this.getAttribute('font-family') || 'Montserrat';
     const fontWeight = parseInt(this.getAttribute('font-weight')) || 700;
-    const lineHeight = parseInt(this.getAttribute('line-height')) || 120; // In px
-    const letterSpacing = parseInt(this.getAttribute('letter-spacing')) || 5; // In px
-    const animationDuration = parseFloat(this.getAttribute('animation-duration')) || 8; // In seconds
+    const lineHeight = parseInt(this.getAttribute('line-height')) || 120;
+    const letterSpacing = parseInt(this.getAttribute('letter-spacing')) || 5;
+    const animationDuration = parseFloat(this.getAttribute('animation-duration')) || 8;
     const textAlignment = this.getAttribute('text-alignment') || 'center';
+    const gradientPreset = this.getAttribute('gradient-preset') || 'vivid-flow';
 
     this.isAnimating = false;
 
@@ -88,12 +126,12 @@ class GradientText extends HTMLElement {
           line-height: ${lineHeight}px;
           letter-spacing: ${letterSpacing}px;
           text-align: ${textAlignment};
-          background: linear-gradient(45deg, #1A759F, #EE6C4D, #3D405B, #A663CC);
+          background: linear-gradient(45deg, ${this.getGradientPreset(gradientPreset)});
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-size: 300% 300%;
           animation: gradient-text ${animationDuration}s ease infinite;
-          animation-play-state: paused; /* Start paused */
+          animation-play-state: paused;
           margin: 0;
         }
 
