@@ -8,7 +8,8 @@ class GradientText extends HTMLElement {
   static get observedAttributes() {
     return [
       'text', 'heading-tag', 'background-color', 'background-opacity',
-      'font-size', 'font-family', 'animation-duration', 'text-alignment', 'gradient-preset'
+      'font-size', 'font-family', 'font-weight', 'line-height',
+      'letter-spacing', 'animation-duration', 'text-alignment', 'gradient-preset'
     ];
   }
 
@@ -52,7 +53,7 @@ class GradientText extends HTMLElement {
 
   getGradientPreset(presetName) {
     const presets = {
-      'vivid-flow': '#1A759F, #EE6C4D, #3D405B, #A663CC',
+      'vivid-flow': '#1A759F, #EE6C4D, #3D405B, #A663CC', // Default
       'sunset-glow': '#FF6B6B, #FFD93D, #FF9F1C, #D00000',
       'ocean-wave': '#00C4CC, #34E4EA, #0077B6, #023E8A',
       'forest-dusk': '#2A9D8F, #E9C46A, #F4A261, #264653',
@@ -84,7 +85,7 @@ class GradientText extends HTMLElement {
       'cyber-punk': '#FF0A54, #FF477E, #FF5C8A, #FF7092',
       'spring-bloom': '#E2EA82, #B7E1A1, #8CD790, #62C370'
     };
-    return presets[presetName] || presets['vivid-flow'];
+    return presets[presetName] || presets['vivid-flow']; // Fallback to default
   }
 
   render() {
@@ -93,19 +94,21 @@ class GradientText extends HTMLElement {
     const backgroundColor = this.getAttribute('background-color') || '#0A3D62';
     const backgroundOpacity = parseFloat(this.getAttribute('background-opacity')) || 100;
     const bgOpacityValue = backgroundOpacity / 100;
+    const bgColorWithOpacity = `${backgroundColor}${Math.round(bgOpacityValue * 255).toString(16).padStart(2, '0')}`;
     const fontSize = parseFloat(this.getAttribute('font-size')) || 5;
     const fontFamily = this.getAttribute('font-family') || 'Montserrat';
+    const fontWeight = parseInt(this.getAttribute('font-weight')) || 700;
+    const lineHeight = parseInt(this.getAttribute('line-height')) || 120;
+    const letterSpacing = parseInt(this.getAttribute('letter-spacing')) || 5;
     const animationDuration = parseFloat(this.getAttribute('animation-duration')) || 8;
     const textAlignment = this.getAttribute('text-alignment') || 'center';
     const gradientPreset = this.getAttribute('gradient-preset') || 'vivid-flow';
 
     this.isAnimating = false;
 
-    const fontImport = `@import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontFamily)}:wght@100..900&display=swap');`;
-
     this.shadowRoot.innerHTML = `
       <style>
-        ${fontImport}
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap');
 
         :host {
           width: 100vw;
@@ -113,12 +116,15 @@ class GradientText extends HTMLElement {
           display: flex;
           justify-content: center;
           align-items: center;
-          background-color: rgba(${parseInt(backgroundColor.slice(1, 3), 16), parseInt(backgroundColor.slice(3, 5), 16), parseInt(backgroundColor.slice(5, 7), 16), ${bgOpacityValue});
+          background-color: ${bgColorWithOpacity};
           overflow: hidden;
         }
 
         .gradient-heading {
           font-size: ${fontSize}vw;
+          font-weight: ${fontWeight};
+          line-height: ${lineHeight}px;
+          letter-spacing: ${letterSpacing}px;
           text-align: ${textAlignment};
           background: linear-gradient(45deg, ${this.getGradientPreset(gradientPreset)});
           -webkit-background-clip: text;
@@ -127,7 +133,6 @@ class GradientText extends HTMLElement {
           animation: gradient-text ${animationDuration}s ease infinite;
           animation-play-state: paused;
           margin: 0;
-          font-family: "${fontFamily}", sans-serif;
         }
 
         @keyframes gradient-text {
