@@ -53,7 +53,7 @@ class GradientText extends HTMLElement {
 
   getGradientPreset(presetName) {
     const presets = {
-      'vivid-flow': '#1A759F, #EE6C4D, #3D405B, #A663CC', // Default
+      'vivid-flow': '#1A759F, #EE6C4D, #3D405B, #A663CC',
       'sunset-glow': '#FF6B6B, #FFD93D, #FF9F1C, #D00000',
       'ocean-wave': '#00C4CC, #34E4EA, #0077B6, #023E8A',
       'forest-dusk': '#2A9D8F, #E9C46A, #F4A261, #264653',
@@ -85,7 +85,7 @@ class GradientText extends HTMLElement {
       'cyber-punk': '#FF0A54, #FF477E, #FF5C8A, #FF7092',
       'spring-bloom': '#E2EA82, #B7E1A1, #8CD790, #62C370'
     };
-    return presets[presetName] || presets['vivid-flow']; // Fallback to default
+    return presets[presetName] || presets['vivid-flow'];
   }
 
   render() {
@@ -93,8 +93,7 @@ class GradientText extends HTMLElement {
     const headingTag = this.getAttribute('heading-tag') || 'h2';
     const backgroundColor = this.getAttribute('background-color') || '#0A3D62';
     const backgroundOpacity = parseFloat(this.getAttribute('background-opacity')) || 100;
-    const bgOpacityValue = backgroundOpacity / 100;
-    const bgColorWithOpacity = `${backgroundColor}${Math.round(bgOpacityValue * 255).toString(16).padStart(2, '0')}`;
+    const bgOpacityValue = backgroundOpacity / 100; // 0-1 scale
     const fontSize = parseFloat(this.getAttribute('font-size')) || 5;
     const fontFamily = this.getAttribute('font-family') || 'Montserrat';
     const fontWeight = parseInt(this.getAttribute('font-weight')) || 700;
@@ -106,9 +105,12 @@ class GradientText extends HTMLElement {
 
     this.isAnimating = false;
 
+    // Convert font family name to Google Fonts URL format (spaces to +)
+    const fontFamilyUrl = fontFamily.replace(/\s+/g, '+');
+
     this.shadowRoot.innerHTML = `
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=${fontFamilyUrl}:wght@100..900&display=swap');
 
         :host {
           width: 100vw;
@@ -116,7 +118,7 @@ class GradientText extends HTMLElement {
           display: flex;
           justify-content: center;
           align-items: center;
-          background-color: ${bgColorWithOpacity};
+          background-color: rgba(${parseInt(backgroundColor.slice(1, 3), 16), parseInt(backgroundColor.slice(3, 5), 16), parseInt(backgroundColor.slice(5, 7), 16), ${bgOpacityValue}});
           overflow: hidden;
         }
 
@@ -133,6 +135,7 @@ class GradientText extends HTMLElement {
           animation: gradient-text ${animationDuration}s ease infinite;
           animation-play-state: paused;
           margin: 0;
+          font-family: '${fontFamily}', sans-serif; /* Ensure font applies */
         }
 
         @keyframes gradient-text {
