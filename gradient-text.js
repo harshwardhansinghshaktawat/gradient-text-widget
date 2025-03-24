@@ -48,7 +48,7 @@ class GradientText extends HTMLElement {
 
   startAnimation() {
     const heading = this.shadowRoot.querySelector('.gradient-heading');
-    heading.style.animationPlayState = 'running';
+    heading.classList.add('animate');
   }
 
   getGradientPreset(presetName) {
@@ -93,7 +93,7 @@ class GradientText extends HTMLElement {
     const headingTag = this.getAttribute('heading-tag') || 'h2';
     const backgroundColor = this.getAttribute('background-color') || '#0A3D62';
     const backgroundOpacity = parseFloat(this.getAttribute('background-opacity')) || 100;
-    const bgOpacityValue = backgroundOpacity / 100; // 0-1 scale
+    const bgOpacityValue = backgroundOpacity / 100;
     const fontSize = parseFloat(this.getAttribute('font-size')) || 5;
     const fontFamily = this.getAttribute('font-family') || 'Montserrat';
     const fontWeight = parseInt(this.getAttribute('font-weight')) || 700;
@@ -105,7 +105,6 @@ class GradientText extends HTMLElement {
 
     this.isAnimating = false;
 
-    // Static import of popular fonts to ensure availability
     const fontImport = `
       @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&family=Open+Sans:wght@300..800&family=Lobster&family=Poppins:wght@100..900&family=Raleway:wght@100..900&display=swap');
     `;
@@ -125,22 +124,36 @@ class GradientText extends HTMLElement {
         }
 
         .gradient-heading {
+          position: relative;
           font-size: ${fontSize}vw;
           font-weight: ${fontWeight};
           line-height: ${lineHeight}px;
           letter-spacing: ${letterSpacing}px;
           text-align: ${textAlignment};
-          background: linear-gradient(45deg, ${this.getGradientPreset(gradientPreset)});
-          background-clip: text;
-          -webkit-background-clip: text;
-          color: transparent; /* Fallback for non-Webkit browsers */
-          -webkit-text-fill-color: transparent; /* Webkit-specific */
-          background-size: 300% 300%;
-          animation: gradient-text ${animationDuration}s ease infinite;
-          animation-play-state: paused;
-          margin: 0;
+          color: #ffffff; /* Fallback color */
           font-family: '${fontFamily}', sans-serif;
-          display: inline-block; /* Ensure text renders */
+          margin: 0;
+          display: inline-block;
+        }
+
+        .gradient-heading::before {
+          content: '${text}';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(45deg, ${this.getGradientPreset(gradientPreset)});
+          background-size: 300% 300%;
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          color: transparent;
+          animation: none; /* Initially no animation */
+        }
+
+        .gradient-heading.animate::before {
+          animation: gradient-text ${animationDuration}s ease infinite;
         }
 
         @keyframes gradient-text {
