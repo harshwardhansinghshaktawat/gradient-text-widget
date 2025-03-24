@@ -105,12 +105,14 @@ class GradientText extends HTMLElement {
 
     this.isAnimating = false;
 
-    // Convert font family name to Google Fonts URL format (spaces to +)
-    const fontFamilyUrl = fontFamily.replace(/\s+/g, '+');
+    // Static import of popular fonts to ensure availability
+    const fontImport = `
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&family=Open+Sans:wght@300..800&family=Lobster&family=Poppins:wght@100..900&family=Raleway:wght@100..900&display=swap');
+    `;
 
     this.shadowRoot.innerHTML = `
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=${fontFamilyUrl}:wght@100..900&display=swap');
+        ${fontImport}
 
         :host {
           width: 100vw;
@@ -129,13 +131,16 @@ class GradientText extends HTMLElement {
           letter-spacing: ${letterSpacing}px;
           text-align: ${textAlignment};
           background: linear-gradient(45deg, ${this.getGradientPreset(gradientPreset)});
+          background-clip: text;
           -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          color: transparent; /* Fallback for non-Webkit browsers */
+          -webkit-text-fill-color: transparent; /* Webkit-specific */
           background-size: 300% 300%;
           animation: gradient-text ${animationDuration}s ease infinite;
           animation-play-state: paused;
           margin: 0;
-          font-family: '${fontFamily}', sans-serif; /* Ensure font applies */
+          font-family: '${fontFamily}', sans-serif;
+          display: inline-block; /* Ensure text renders */
         }
 
         @keyframes gradient-text {
